@@ -1,0 +1,45 @@
+碰到一个需求，给服某些要求的玩家的发送道具奖励，奖励的数量根据离线的天数计算。
+
+这个需求实现起来很简单，只需要在玩家上线的时候计算上次离线时间和当前时间间隔的天数，然后根据策划的算法，计算出道具种类与数量，发一封邮件给玩家就可以了。
+
+计算两个时间间隔天数的函数没有现成的，自己又懒得写，就上谷歌搜了下，选了第一条结果，代码如下
+把代码复制到项目里，调试下，发现没问题就直接用了，毕竟谷歌结果第一名，放心。
+
+这段代码跑了几个月一直没问题，但是到了2020-1-1日那天，有玩家反馈收到了几百封奖励邮件，高兴坏了，但是出于对游戏的热爱，还是通知了运营人员。
+
+运营把bug反馈到服务器这边后我开始排查，百思不得其解的是最近几天都没有更新服务器， 而前几天服务器都稳稳地，怎么突然就出BUG了呢。
+
+接下来就是分析玩家数据，结合代码逻辑确定问题所在，最终根据BUG的表现排除了所有可能性后，发现唯一可能出问题的地方就是那个网上复制过来的计算天数差的函数。
+
+根据调试发现，这个函数在两个日期参数是不同的年份并且第一个日期大于第二个日期的时候，会返回一个错误的结果
+
+比如
+
+differentDays("2020-1-1","2019-12-25")
+理论上这么调用正确的结果是 -7，但是因为函数有bug，调用结果是 358
+
+于是本来不用发奖励，因为这种特殊情况一下子发出去358份，严重影响了游戏某类道具的平衡性。
+
+至于补救方式就是统计名单，把发出去但还没有用掉的道具回收，用掉的就当福利，然后再发公告道歉，再送些其他物品弥补。
+
+也幸好补救的及时，要是这些道具收不回来，游戏运营的策略都要大变了，我特么肯定没好果子吃了。
+
+所以千万别在网上复制来路不明的代码乱用，如果真的要用，必须反复测试，否则哪一天突然暴雷有你受的。
+
+改用Java8的日期库修复了BUG
+
+    public static int differentDays(Date date1, Date date2) {
+        if (date1 == null || date2 == null) {
+            throw new RuntimeException("日期不能为空");
+        }
+        LocalDate localDate1 = date2LocalDate(date1);
+        LocalDate localDate2 = date2LocalDate(date2);
+        return Generic.long2int(localDate1.until(localDate2, ChronoUnit.DAYS));
+    }
+
+    public static LocalDate date2LocalDate(Date date) {
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDate localDate = instant.atZone(zoneId).toLocalDate();
+        return localDate;
+    }

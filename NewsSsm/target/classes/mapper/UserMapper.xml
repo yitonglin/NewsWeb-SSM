@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.news.lyt.dao.UserMapper" >
+
+<!--    注册email = "+#{emailAddress}+"-->
+    <insert id="register" parameterType="com.news.lyt.domain.User">
+      insert into user(username,password,status,email,photo) values(#{username},#{password},0,#{email},#{photo});
+    </insert>
+
+<!--    邮箱激活进行标志的修改-->
+    <update id="active" parameterType="com.news.lyt.domain.EmailActive">
+        UPDATE user SET status = #{status} WHERE email = #{emailAddress} and username = #{username};
+    </update>
+
+<!--    登录-->
+    <select id="login" parameterType="com.news.lyt.domain.User"  resultType="com.news.lyt.domain.User" >
+		select * from user where username=#{username} and password=#{password};
+    </select>
+
+    <!--验证用户名是会否存在-->
+    <select id="findUser" parameterType="String"  resultType="com.news.lyt.domain.User" >
+    select * from user where username=#{username};
+    </select>
+
+
+</mapper>

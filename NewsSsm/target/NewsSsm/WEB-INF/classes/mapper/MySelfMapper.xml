@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.news.lyt.dao.MySelfMapper" >
+
+<!--    查询头像-->
+    <select id="findhead" parameterType="com.news.lyt.domain.User" resultType="String">
+        select photo from user where username=#{username}
+    </select>
+
+
+<!--    用于显示个人信息-->
+    <select id="lookMyself" resultType="com.news.lyt.domain.User" parameterType="java.lang.String">
+        SELECT * FROM user WHERE username = #{username}
+    </select>
+
+<!--    修改个人信息-->
+    <select id="reMyself" parameterType="com.news.lyt.domain.User">
+        UPDATE user SET username=#{username},password=#{password},email=#{email},photo=#{photo} WHERE id=#{id};
+    </select>
+
+<!--    查询用户评论的数量-->
+    <select id="myComments" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM comments  WHERE uid=#{id}
+    </select>
+
+<!--    分页查询个人评论-->
+    <select id="lookMyselfComments" parameterType="java.lang.Integer" resultType="com.news.lyt.domain.MyCommentsVo">
+        select * from comments WHERE uid=#{param2} limit #{param1},6;
+    </select>
+
+<!--    根据用户名查询用于id和头像地址-->
+    <select id="findUserIdAndPhoto" parameterType="java.lang.String" resultType="com.news.lyt.domain.UserIdAndPhoto">
+        SELECT id,photo FROM user WHERE username=#{username};
+    </select>
+
+
+<!--    根据nid查询新闻信息-->
+    <select id="findNewsByNid" parameterType="java.lang.Integer" resultType="com.news.lyt.domain.News">
+        SELECT * FROM news WHERE id=#{nid}
+    </select>
+
+    <!--查询收藏总数-->
+    <select id="lookMyselfCollectionNum" parameterType="int" resultType="int">
+        SELECT count(*) FROM collection WHERE uid=#{id}
+    </select>
+
+    <!--查询收藏博客的信息-->
+    <select id="lookMyselfCollection" parameterType="int" resultType="com.news.lyt.domain.CollectionVo">
+        select category.cname,news.newsname,news.replynum,news.time from news,category where news.id in(select nid from collection where uid=#{userId}) AND news.cid=category.id limit #{page},6;
+    </select>
+
+</mapper>

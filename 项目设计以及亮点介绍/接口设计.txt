@@ -1,0 +1,40 @@
+接口：
+主页设计:
+    一级路径：/user
+        二级路径：
+                注册：register.action
+                登录：login.action
+                邮箱激活：emailActive.action
+                监听用户是否重复注册：finduser.action
+                用户协议：agreement.action
+                隐私条款：privacy.action
+新闻页设计：
+    一级路径：/news
+        二级路径：
+            分类显示：
+                    娱乐：entertainment.jsp    entertainment.action
+                    生活：life.jsp                  life.action
+                    财经：money.jsp              money.action
+                    科技：technology.jsp        technology.action
+                    军事：military.jsp              military.action
+            搜索：search.action
+            热门资讯：hotNews.action
+            最新：newsPage.action
+            轮播图：takePhotos.action
+            分类的资讯推荐：categoryHotNews.action
+            收藏：collection.action (后台需接收title，以及取消收藏标识 0取消收藏，1收藏)
+            收藏查询：searchConllection.action(根据新闻ID)
+            详情：details.action
+            评论：conmments.action (后台需接收title)
+
+个人页面设计：
+    一级路径：/myself
+        二级路径：
+                查询我的评论：searchComments.action (设计VO  CommentsVo，后台查询用户内的nid list，根据list查询所有评论)
+                查询我的收藏：searchCollection.action(设计VO CollectionVo 根据用户id查询所有的收藏新闻list)
+                修改个人信息：reMyself.action  参数：User
+                查看个人信息：lookMyself.action  参数：username  返回：User
+                分页查询个人评论：lookMyselfComments.action 
+                查询个人评论的总条数：lookMyselfCommentsNum.action
+                登出：unLogin.action
+        

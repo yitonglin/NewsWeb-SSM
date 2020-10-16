@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.news.lyt.dao.NewsMapper" >
+
+<!--    首页新闻查询-->
+    <select id="newsPage" resultType="com.news.lyt.domain.News">
+        select * from news order by time DESC limit 10;
+    </select>
+
+
+<!--    轮播图查询-->
+    <select id="takePhotos" resultType="com.news.lyt.domain.TakePhtoco" parameterType="java.lang.Integer">
+        select news.newsname,news.photoaddress from news,category WHERE category.id=#{categoryPhoto} order by news.looknum DESC limit 5 ;
+    </select>
+
+
+<!--    搜索框模糊查询-->
+    <select id="searchnews" resultType="com.news.lyt.domain.News" parameterType="java.lang.String">
+        SELECT * FROM news WHERE newsname LIKE #{title}
+    </select>
+
+<!--    热门资讯查询-->
+    <select id="hotNews" resultType="com.news.lyt.domain.News">
+        select * from news order by looknum DESC limit 10;
+    </select>
+
+<!--    新闻详情-->
+    <select id="details" resultType="com.news.lyt.domain.News" parameterType="java.lang.String">
+        SELECT * from news where newsname = #{title};
+    </select>
+
+<!--    新闻页评论id查询-->
+    <select id="commens" parameterType="java.lang.String" resultType="com.news.lyt.domain.News">
+            SELECT * FROM news WHERE newsname = #{title};
+    </select>
+
+<!--    查询所有评论-->
+    <select id="nidByid" parameterType="com.news.lyt.domain.NidById" resultType="com.news.lyt.domain.Comments">
+        SELECT * FROM comments WHERE nid IN (SELECT nid FROM comments WHERE nid = #{nid}) order by commentstime DESC limit #{limitNum};
+    </select>
+
+<!--    查询一共多少评论-->
+    <select id="idByNum" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COUNT(id) FROM comments WHERE nid = #{nid}
+    </select>
+
+<!--    根据uid查询评论username-->
+    <select id="uidByUsername" parameterType="java.lang.Integer" resultType="com.news.lyt.domain.UsernameAndPhoto">
+        SELECT username,photo FROM user WHERE id = #{uid}
+    </select>
+
+
+    <!--  查询nid  -->
+    <select id="findnid" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT id FROM news WHERE newsname=#{title}
+    </select>
+
+    <!--  查询uid  -->
+    <select id="finduid" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT id FROM user WHERE username=#{username}
+    </select>
+
+<!--  插评论  -->
+    <insert id="insertcomments" parameterType="com.news.lyt.domain.CommentsVoSave" >
+        INSERT INTO comments (nid,uid,content,commentstime) VALUES(#{nid},#{uid},#{content},#{commentstime})
+    </insert>
+
+
+     <!--分类页面中热门资讯查询-->
+    <select id="categoryHotNews" resultType="com.news.lyt.domain.News" parameterType="int">
+        select * from news  where cid=#{active} order by cid DESC limit 10;
+    </select>
+
+    <!--根据博客名称查询博客id-->
+    <select id="searchNewsId" resultType="int" parameterType="java.lang.String">
+        select id from news  where newsname=#{title};
+    </select>
+    <!--根据分类，进行分类页面所需博文的查询-->
+    <select id="categoryPage" resultType="com.news.lyt.domain.News" parameterType="int">
+        SELECT * FROM news WHERE cid=#{active}
+    </select>
+
+
+    <!--insertCollection插入设置收藏信息-->
+    <insert id="insertCollection"  parameterType="int">
+      insert into collection(uid,nid) values(#{userId},#{newsId});
+    </insert>
+
+    <!--deleteCollection取消收藏，删除收藏信息-->
+    <delete id="deleteCollection" parameterType="int">
+         delete from collection where id=(SELECT id FROM(select id from collection where uid=#{userId} and nid=#{newsId}) AS a);
+    </delete>
+
+    <!--查询是否被收藏-->
+    <select id="collectionop" parameterType="int" resultType="int">
+    select count(*) from collection where uid=#{userId} and nid=#{newsId};
+    </select>
+
+    <select id="findhead" parameterType="com.news.lyt.domain.User" resultType="String">
+        select photo from user where username=#{username}
+    </select>
+
+    <!--设置文章阅读量-->
+    <update id="addLookNum" parameterType="java.lang.String">
+        update news set looknum=looknum+1 where  newsname=#{title};
+    </update>
+    <!--    评论数量加1-->
+    <update id="addOneReply" parameterType="java.lang.Integer">
+        update news set replynum=replynum+1 where id=#{nid}
+    </update>
+</mapper>
